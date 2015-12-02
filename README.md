@@ -15,7 +15,6 @@ The packet tagging module hooks into the data path using `Netfilter` hooks. To i
 <pre><code>$ insmod pias.ko param_dev=eth2<br/>
 $ dmesg|tail<br/>
 PIAS: start on eth2<br/>
-PIAS: anti-starvation mechanism is enabled
 </code></pre>
 
 `param_dev` is the name of NIC that `pias.ko` works on. It is `eth1` by default.
