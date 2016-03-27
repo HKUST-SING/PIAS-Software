@@ -5,19 +5,24 @@ The kernel module of PIAS (<strong>P</strong>ractical <strong>I</strong>nformati
 ## Compiling
  I have tested this kernel module with Linux kernel 2.6.38.3 and 3.18.11. You need the kernel headers to compile it:  
 
-<pre><code>$ cd pias3<br/>
+<pre><code>$ cd pias4<br/>
 $ make</code></pre>
 
-Then you can get a kernel module called `pias.ko`. Note that the anti-starvation mechanism (`DANTI_STARVATION` in Makefile) is disabled by default. Under such setting, for a flow experiencing several consecutive TCP timeouts, we will reset its bytes sent information back to 0. You can also modify Makefile to enable it. 
+Then you can get a kernel module called `pias.ko`. 
 
 ## Installing 
-The packet tagging module hooks into the data path using `Netfilter` hooks. To install it:
-<pre><code>$ insmod pias.ko param_dev=eth2<br/>
+`pias.ko` hooks into the data path using `Netfilter` hooks. To install it:
+<pre><code>$ insmod pias.ko<br/>
 $ dmesg|tail<br/>
-PIAS: start on eth2<br/>
+PIAS: start on any interface (TCP port 0)<br/>
 </code></pre>
 
-`param_dev` is the name of NIC that `pias.ko` works on. It is `eth1` by default.
+By default, `pias.ko` filters all TCP packets (0=all) on all NICs. You can also specify the NIC and TCP port number. For exmaple, 
+to make `pias.ko` only filters TCP packets whose (source or destination) port numbers are 5001 on eth1:
+<pre><code>$ insmod pias.ko param_dev=eth1 param_port=5001<br/>
+$ dmesg|tail<br/>
+PIAS: start on eth1 (TCP port 5001)<br/>
+</code></pre>
 
 To remove the packet tagging module:
 <pre><code>$ rmmod pias<br/>
@@ -26,7 +31,7 @@ PIAS: stop working
 </code></pre>
 
 ## Usage
-PIAS packet tagging module exports two types of configurations interfaces: a sysfs file to control flow table and several sysctl interfaces to configure priority parameters (see `params.h` for their definitions).
+PIAS packet tagging module exports two types of configurations interfaces: a sysfs file to control flow table and several sysctl interfaces to configure priority parameters (see `params.h` and `params.c` for their definitions).
 
 To print the information of all flows in current flow table:
 <pre><code>$ echo -n print > /sys/module/pias/parameters/param_table_operation<br/>
@@ -48,11 +53,11 @@ To clear all the information in current flow table:
 </code></pre>
 
 To show the DSCP value of highest priority:
-<pre><code>$ sysctl pias.PIAS_PRIO_DSCP_1<br/>
-pias.PIAS_PRIO_DSCP_1 = 7
+<pre><code>$ sysctl pias.prio_dscp_0<br/>
+pias.prio_dscp_0 = 0
 </code></pre>
 
 To set the first demoting threshold to 50KB:
-<pre><code>$ sysctl -w pias.PIAS_PRIO_THRESH_1=51200
+<pre><code>$ sysctl -w pias.prio_thresh_0=51200
 </code></pre>
 
