@@ -92,8 +92,8 @@ inline bool PIAS_Equal_Flow(struct PIAS_Flow* f1, struct PIAS_Flow* f2)
 bool PIAS_Init_Info(struct PIAS_Flow_Info* info)
 {
 	//We need to initialize 7 variables in total
-    if (likely(info))
-    {
+	if (likely(info))
+	{
 		info->last_copy_time = ktime_set(0, 0);
 		info->last_update_time = ktime_set(0, 0);
 		info->last_timeout_seq = 0;
@@ -103,8 +103,8 @@ bool PIAS_Init_Info(struct PIAS_Flow_Info* info)
 		info->timeouts = 0;
 		info->messages = 0;
 		return true;
-    }
-    else
+	}
+	else
 	{
 		printk(KERN_INFO "PIAS_Init_Info: NULL pointer\n");
 		return false;
@@ -117,14 +117,14 @@ bool PIAS_Init_Flow(struct PIAS_Flow* f)
 	if (likely(f))
 	{
 		f->local_ip = 0;
-    	f->remote_ip = 0;
-    	f->local_port = 0;
-    	f->remote_port = 0;
+		f->remote_ip = 0;
+		f->local_port = 0;
+		f->remote_port = 0;
 		INIT_LIST_HEAD(&(f->list));
 		spin_lock_init(&(f->lock));
     	//Initialize the Info of this Flow
-    	PIAS_Init_Info(&(f->info));
-    	return true;
+		PIAS_Init_Info(&(f->info));
+		return true;
 	}
 	else
     {
@@ -165,17 +165,18 @@ bool PIAS_Init_Table(struct PIAS_Flow_Table* ft)
 	buf = vmalloc(PIAS_HASH_RANGE * sizeof(struct PIAS_Flow_List));
 	if (buf)
 	{
-    	ft->flow_lists = buf;
+		ft->flow_lists = buf;
 		atomic_set(&(ft->size), 0);
 
-    	for (i = 0; i < PIAS_HASH_RANGE; i++)
+		for (i = 0; i < PIAS_HASH_RANGE; i++)
 		{
-        	if (!PIAS_Init_List(&(ft->flow_lists[i])))
-            	return false;
+			if (!PIAS_Init_List(&(ft->flow_lists[i])))
+				return false;
 		}
+
 		return true;
 	}
-    else
+	else
 	{
 		printk(KERN_INFO "PIAS_Init_Table: vmalloc error\n");
 		return false;
